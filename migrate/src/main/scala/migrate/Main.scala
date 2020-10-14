@@ -23,6 +23,7 @@ object Main {
                         scala3CompilerOptions: Seq[String],
                         scala3ClassDirectory: AbsolutePath
                       ): Try[String] = {
+    scribe.info(s"Migrating $source")
     for {
       compiler <- setupScala3Compiler(scala3Classpath, scala3ClassDirectory)
       initialFileToMigrate <- buildMigrationFiles(
@@ -78,6 +79,7 @@ object Main {
                                   toolClasspath: Classpath,
                                   compilerOptions: Seq[String]
                                  ): Try[Seq[FileMigrationState.Initial]] = {
+                                  
     for {
       fileEvaluations <- timedMs {
         inferTypes(sourceRoot, sources, classpath, toolClasspath, compilerOptions)
