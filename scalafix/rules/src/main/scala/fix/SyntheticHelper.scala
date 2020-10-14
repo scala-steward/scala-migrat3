@@ -1,15 +1,20 @@
 package fix
 
 import scalafix.Patch
-import scalafix.v1.{SemanticDocument, SemanticTree}
+import scalafix.v1.{OriginalTree, SemanticDocument, SemanticTree}
 
+import scala.collection.immutable.{AbstractSeq, LinearSeq}
 import scala.meta.Tree
+import scalafix.v1._
+import scala.meta._
+
 
 object SyntheticHelper {
   def buildPatch(tree: Tree, s: List[SemanticTree])(implicit doc: SemanticDocument): Patch = {
+
     filterSynthetics(s) match {
       case Some(semanticTree) =>     val place = Place.where('*', semanticTree)
-        val semanticTreeString = semanticTree.toString()
+        val semanticTreeString = semanticTree.toString(250)
         place match {
           case Place.Left => {
             val value = semanticTreeString.drop(1)
@@ -27,6 +32,12 @@ object SyntheticHelper {
       case None => Patch.empty
     }
   }
+
+  def buildPatch(tree: Tree, s: SemanticTree): Patch =
+    filterSynthetics(List(s)) match {
+      case Some(value) => Patch.addRight(tree, value.toString())
+      case None => Patch.empty
+    }
 
   private def filterSynthetics(s: List[SemanticTree]): Option[SemanticTree] = {
     assert(s.length == 1 , s"Synthetics should always be a one element list, but it's not: $s")

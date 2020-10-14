@@ -57,6 +57,9 @@ private[migrate] class FileMigration(fileToMigrate: FileMigrationState.Initial, 
 
       loopUntilCompile(Success(initialStep)) map {
         case CompilationStep(kept, _, necessary) =>
+          val remainingPatches = kept ++ necessaryPatches ++ necessary
+          val result = fileToMigrate.previewPatches(remainingPatches)
+          println(result.get.content)
           CompilingState(kept, necessaryPatches ++ necessary)
       }
     }
