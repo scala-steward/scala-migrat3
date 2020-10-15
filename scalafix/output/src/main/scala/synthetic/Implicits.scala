@@ -1,0 +1,4 @@
+package synthetic
+
+object Implicits {
+}

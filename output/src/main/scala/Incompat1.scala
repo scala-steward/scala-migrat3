@@ -1,13 +1,13 @@
-// object Incompat1 {
-//   trait Foo { 
-//     type Inner
-//   }
+ object Incompat1 {
+   trait Foo {
+     type Inner
+   }
 
-//   object Foo {
-//     val foo: Foo { type Inner = String } = ???
+   object Foo {
+     val foo: Foo { type Inner = String } = ???
     
-//     def inner(foo: Foo): foo.Inner = ???
+     def inner(foo: Foo): foo.Inner = ???
 
-//     def bar(f: String => Int): Option[Int] = Some[String](inner(foo)).map(f)
-//   }
-// }
+     def bar(f: String => Int): Option[Int] = Some[String](inner(foo)).map(f)
+   }
+ }

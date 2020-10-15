@@ -30,17 +30,6 @@ class MigrationRule(global: ScalafixGlobal) extends SemanticRule("MigrationRule"
     }
   }
 
-  //  final case class IdTree(info: SymbolInformation) extends SemanticTree { def symbol: Symbol = info.symbol }
-  //  final case class SelectTree(qualifier: SemanticTree, id: IdTree) extends SemanticTree
-  //  final case class ApplyTree(function: SemanticTree, arguments: List[SemanticTree]) extends SemanticTree
-  //  final case class TypeApplyTree(function: SemanticTree, typeArguments: List[SemanticType]) extends SemanticTree
-  //  final case class FunctionTree(parameters: List[IdTree], body: SemanticTree) extends SemanticTree
-  //  final case class LiteralTree(constant: Constant) extends SemanticTree
-  //  final case class MacroExpansionTree(beforeExpansion: SemanticTree, tpe: SemanticType) extends SemanticTree
-  //  final case class OriginalSubTree(tree: scala.meta.Tree) extends SemanticTree
-  //  final case class OriginalTree(tree: scala.meta.Tree) extends SemanticTree
-
-
   override def fix(implicit doc: SemanticDocument): Patch = {
     //    println(s"doc.synthetics.toList = ${doc.synthetics.toList}")
     //    doc.synthetics.collect {
@@ -68,58 +57,40 @@ class MigrationRule(global: ScalafixGlobal) extends SemanticRule("MigrationRule"
         fixDefinition(t, name, body)
     }.asPatch
 
-    val patch2 = addSynthetics(doc.synthetics)
+    val patch2 = addSynthetics()
     patch1 + patch2
   }
 
-  private def addSynthetics(semantics: Iterator[SemanticTree])(implicit doc: SemanticDocument): Patch = {
-    doc.synthetics.foreach(t => println(s"t.productPrefix = $t => ${t.productPrefix} "))
+  private def addSynthetics()(implicit doc: SemanticDocument): Patch = {
+    doc.synthetics.foreach(t => println(s"t.productPrefix = $t => ${t.structure} "))
     doc.synthetics.collect {
       case t@ApplyTree(function: SemanticTree, arguments: List[SemanticTree]) if(!t.toString().contains("$"))=>
         function match {
           case f@OriginalTree(tree) => SyntheticHelper.buildPatch(tree, List(t))
           case value => Patch.empty
         }
-      //      case t@IdTree(p) => println(s"IdTree(p) = ${IdTree(p)}")
-      //      case t@SelectTree(qualifier, id) => println(s"IdTree(p) = ${SelectTree(qualifier, id)}")
       case t@TypeApplyTree(function: SemanticTree, typeArguments: List[SemanticType]) =>
 //        println(s"typeArguments = ${typeArguments}")
         function match {
           case f @OriginalTree(sub) =>
-            println(t)
-            println(s"f.tree ${f.tree}")
-            println(s"f.tree.Pat.ExtractInfix ${f.tree.productPrefix}")
             if (sub.isInstanceOf[Term.ApplyInfix]) Patch.empty
             else SyntheticHelper.buildPatch(f.tree, List(t))
           case s@SelectTree(qualifier, id) =>
             qualifier match {
               case OriginalTree(subtree) =>
-                println(t)
-                println(s"subtree ${subtree.productPrefix} $subtree")
-                println(s"subtree.syntax = ${subtree.syntax}")
-//                println(s"qualifier = ${qualifier}")
-//                println(s"id = ${id}")
-//                println(s"id = ${id.info}")
                 SyntheticHelper.buildPatch(subtree, List(t))
               case _ => Patch.empty
             }
           case value =>
-//            println(s"t.toString() = ${t.toString()}")
-//            println(s"value.productPrefix = ${value.productPrefix}")
             Patch.empty
         }
       case t@SelectTree(qualifier: SemanticTree, id: IdTree)  =>
-//        println(s"t.toString() = ${t.toString()}")
         qualifier match {
           case f@OriginalTree(tree) => SyntheticHelper.buildPatch(tree, List(t))
           case value =>
-//            println(s"value.productPrefix = ${value.productPrefix}")
-//            println(s"value.toString() = ${value.toString()}")
             Patch.empty
         }
       case t =>
-//        println(s"t.productPrefix = ${t.productPrefix}")
-//        println(s"t.toString() = ${t.toString()}")
         Patch.empty
 
 
