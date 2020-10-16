@@ -11,5 +11,5 @@
  object Test {
    def from[M[_], T](m: M[T])(implicit ctx: Context[M]): Unit = ???
 
-   from[Foo, Int](Fizz)(ctx)
+   from[Foo, Int](Fizz)(Foo.ctx)
  }

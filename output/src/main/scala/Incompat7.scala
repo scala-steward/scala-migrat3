@@ -13,6 +13,6 @@ object Incompat7 {
 
     implicit val writer: Writer[Map[List[Int], Int]] = ???
 
-    rw(Map(List(1) -> 1))(mapReader(seqLikeReader(intReader,List.iterableFactory[Int]),intReader),writer)
+    rw[Map[List[Int],Int]](Map(List(1) -> 1))
   }
 }

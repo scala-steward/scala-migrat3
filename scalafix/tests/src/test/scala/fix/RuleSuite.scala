@@ -5,8 +5,8 @@ import scalafix.testkit._
 
 class RuleSuite extends AbstractSemanticRuleSuite with FunSuiteLike {
   val (passing, failing) = testsToRun.partition(!_.path.testName.contains("_fails"))
-  passing.foreach(runOn)
-//  runOnSpecificTest("ExplicitResultTypesRefinement.scal")
+//  passing.foreach(runOn)
+  runOnSpecificTest("TypeApply1")
 //  runOnSpecificTest("Implicits")
   // for running only one test if using Intellij
   def runOnSpecificTest(name: String): Unit = {
