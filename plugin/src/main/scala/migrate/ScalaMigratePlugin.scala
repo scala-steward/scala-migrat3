@@ -34,7 +34,7 @@ object ScalaMigratePlugin extends AutoPlugin {
     Def.settings(
       migrate := migrateImp.value,
       scala3Inputs := {
-        val state1 = Command.process(s"++ ${scala3Version}! ", state.value)
+        val state1 = Command.process(s"""set scalaVersion:="${scala3Version}" """, state.value)
         val state2 = Command.process("storeScala3Inputs", state1)
         (for {
           classpath      <- state2.attributes.get(classpathAttribute)
